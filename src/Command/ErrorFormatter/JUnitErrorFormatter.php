@@ -16,6 +16,7 @@ class JUnitErrorFormatter implements ErrorFormatter
         /** @var \DomElement $testsuite */
         $testsuite = $testsuites->appendChild($dom->createElement('testsuite'));
         $testsuite->setAttribute('name', 'PHPStan');
+        $testsuite->setAttribute('failures', (string) $analysisResult->getTotalErrorsCount());
 
         $returnCode = 1;
 
@@ -50,7 +51,7 @@ class JUnitErrorFormatter implements ErrorFormatter
                 $testcase = $dom->createElement('testcase');
                 $testcase->setAttribute('file', $cropFilename($file));
                 $testcase->setAttribute('failures', (string)count($errors));
-                $testcase->setAttribute('errors', (string)count($errors));
+                $testcase->setAttribute('errors', '0');
                 $testcase->setAttribute('tests', (string)count($errors));
 
                 foreach ($errors as $error) {
@@ -62,6 +63,21 @@ class JUnitErrorFormatter implements ErrorFormatter
 
                 $testsuite->appendChild($testcase);
             }
+
+            $genericErrors = $analysisResult->getNotFileSpecificErrors();
+            $testcase = $dom->createElement('testcase');
+            $testcase->setAttribute('name', 'Generic Failures');
+            $testcase->setAttribute('failures', (string)count($genericErrors));
+            $testcase->setAttribute('errors', '0');
+            $testcase->setAttribute('tests', (string)count($genericErrors));
+            foreach ($genericErrors as $genericError) {
+                $failure = $dom->createElement('failure');
+                $failure->setAttribute('type', 'error');
+                $failure->setAttribute('message', $genericError);
+                $testcase->appendChild($failure);
+            }
+
+            $testsuite->appendChild($testcase);
         }
 
         $dom->formatOutput = true;

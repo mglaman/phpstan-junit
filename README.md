@@ -12,4 +12,4 @@ services:
 		class: PHPStan\Command\ErrorFormatter\JUnitErrorFormatter
 ```
 
-Now you can format PHPStan's output using `--format=junit`.
+Now you can format PHPStan's output using `--error-format=junit`.
