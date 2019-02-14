@@ -1,0 +1,25 @@
+{
+    "name": "mglaman/phpstan-junit",
+    "description": "ErrorFormatter for PHPStan to output errors in JUnit format",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matt Glaman",
+            "email": "nmd.matt@gmail.com"
+        }
+    ],
+    "require": {
+        "phpstan/phpstan": "^0.11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPStan\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+          "dev-master": "0.12-dev"
+        }
+      }
+}
