@@ -54,9 +54,9 @@ class JUnitErrorFormatter implements ErrorFormatter
                 $testcase->setAttribute('tests', (string)count($errors));
 
                 foreach ($errors as $error) {
-                    $failure = $dom->createElement('failure', sprintf('On line %d', $error->getLine()));
+                    $failure = $dom->createElement('failure');
                     $failure->setAttribute('type', 'error');
-                    $failure->setAttribute('message', $error->getMessage());
+                    $failure->setAttribute('message', sprintf('%s on line %d', $error->getMessage(), $error->getLine()));
                     $testcase->appendChild($failure);
                 }
 
