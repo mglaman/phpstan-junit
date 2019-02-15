@@ -3,12 +3,20 @@
 namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
-use PHPStan\Command\ErrorFormatter\ErrorFormatter;
+use PHPStan\File\RelativePathHelper;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Style\OutputStyle;
 
 class JUnitErrorFormatter implements ErrorFormatter
 {
+    /** @var RelativePathHelper */
+    private $relativePathHelper;
+
+    public function __construct(RelativePathHelper $relativePathHelper)
+    {
+        $this->relativePathHelper = $relativePathHelper;
+    }
+
     public function formatErrors(AnalysisResult $analysisResult, OutputStyle $style): int
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -28,15 +36,6 @@ class JUnitErrorFormatter implements ErrorFormatter
 
             $returnCode = 0;
         } else {
-            $currentDirectory = $analysisResult->getCurrentDirectory();
-            $cropFilename = function (string $filename) use ($currentDirectory): string {
-                if ($currentDirectory !== '' && strpos($filename, $currentDirectory) === 0) {
-                    return substr($filename, strlen($currentDirectory) + 1);
-                }
-
-                return $filename;
-            };
-
             /** @var \PHPStan\Analyser\Error[][] $fileErrors */
             $fileErrors = [];
             foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
@@ -49,7 +48,7 @@ class JUnitErrorFormatter implements ErrorFormatter
 
             foreach ($fileErrors as $file => $errors) {
                 $testcase = $dom->createElement('testcase');
-                $testcase->setAttribute('name', $cropFilename($file));
+                $testcase->setAttribute('name', $this->relativePathHelper->getRelativePath($file));
                 $testcase->setAttribute('failures', (string)count($errors));
                 $testcase->setAttribute('errors', '0');
                 $testcase->setAttribute('tests', (string)count($errors));
