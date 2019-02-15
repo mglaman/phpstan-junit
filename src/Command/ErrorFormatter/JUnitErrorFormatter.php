@@ -49,7 +49,7 @@ class JUnitErrorFormatter implements ErrorFormatter
 
             foreach ($fileErrors as $file => $errors) {
                 $testcase = $dom->createElement('testcase');
-                $testcase->setAttribute('file', $cropFilename($file));
+                $testcase->setAttribute('name', $cropFilename($file));
                 $testcase->setAttribute('failures', (string)count($errors));
                 $testcase->setAttribute('errors', '0');
                 $testcase->setAttribute('tests', (string)count($errors));
