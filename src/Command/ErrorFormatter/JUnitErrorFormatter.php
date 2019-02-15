@@ -64,19 +64,21 @@ class JUnitErrorFormatter implements ErrorFormatter
             }
 
             $genericErrors = $analysisResult->getNotFileSpecificErrors();
-            $testcase = $dom->createElement('testcase');
-            $testcase->setAttribute('name', 'Generic Failures');
-            $testcase->setAttribute('failures', (string)count($genericErrors));
-            $testcase->setAttribute('errors', '0');
-            $testcase->setAttribute('tests', (string)count($genericErrors));
-            foreach ($genericErrors as $genericError) {
-                $failure = $dom->createElement('failure');
-                $failure->setAttribute('type', 'error');
-                $failure->setAttribute('message', $genericError);
-                $testcase->appendChild($failure);
-            }
+            if (!empty($genericErrors)) {
+                $testcase = $dom->createElement('testcase');
+                $testcase->setAttribute('name', 'Generic Failures');
+                $testcase->setAttribute('failures', (string)count($genericErrors));
+                $testcase->setAttribute('errors', '0');
+                $testcase->setAttribute('tests', (string)count($genericErrors));
+                foreach ($genericErrors as $genericError) {
+                    $failure = $dom->createElement('failure');
+                    $failure->setAttribute('type', 'error');
+                    $failure->setAttribute('message', $genericError);
+                    $testcase->appendChild($failure);
+                }
 
-            $testsuite->appendChild($testcase);
+                $testsuite->appendChild($testcase);
+            }
         }
 
         $dom->formatOutput = true;
