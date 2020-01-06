@@ -46,39 +46,40 @@ class JUnitErrorFormatter implements ErrorFormatter
                 $fileErrors[$fileSpecificError->getFile()][] = $fileSpecificError;
             }
 
-            foreach ($fileErrors as $file => $errors) {
-                $testcase = $dom->createElement('testcase');
-                $testcase->setAttribute('name', $this->relativePathHelper->getRelativePath($file));
-                $testcase->setAttribute('failures', (string)count($errors));
-                $testcase->setAttribute('errors', '0');
-                $testcase->setAttribute('tests', (string)count($errors));
+            $errorCount = 0;
 
+            foreach ($fileErrors as $file => $errors) {
                 foreach ($errors as $error) {
+                    $errorCount += 1;
+                    $testcase = $dom->createElement('testcase');
+                    $testcase->setAttribute('name', $this->relativePathHelper->getRelativePath($file));
+
                     $failure = $dom->createElement('failure');
                     $failure->setAttribute('type', 'error');
                     $failure->setAttribute('message', sprintf('%s on line %d', $error->getMessage(), $error->getLine()));
                     $testcase->appendChild($failure);
+                    $testsuite->appendChild($testcase);
                 }
 
-                $testsuite->appendChild($testcase);
             }
 
             $genericErrors = $analysisResult->getNotFileSpecificErrors();
             if (!empty($genericErrors)) {
-                $testcase = $dom->createElement('testcase');
-                $testcase->setAttribute('name', 'Generic Failures');
-                $testcase->setAttribute('failures', (string)count($genericErrors));
-                $testcase->setAttribute('errors', '0');
-                $testcase->setAttribute('tests', (string)count($genericErrors));
                 foreach ($genericErrors as $genericError) {
+                    $errorCount += 1;
+                    $testcase = $dom->createElement('testcase');
+                    $testcase->setAttribute('name', 'Generic Failures');
                     $failure = $dom->createElement('failure');
                     $failure->setAttribute('type', 'error');
                     $failure->setAttribute('message', $genericError);
                     $testcase->appendChild($failure);
+                    $testsuite->appendChild($testcase);
                 }
 
-                $testsuite->appendChild($testcase);
             }
+            $testsuite->setAttribute('failures', (string)$errorCount);
+            $testsuite->setAttribute('errors', '0');
+            $testsuite->setAttribute('tests', (string)$errorCount);
         }
 
         $dom->formatOutput = true;
