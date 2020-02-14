@@ -3,9 +3,8 @@
 namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
+use PHPStan\Command\Output;
 use PHPStan\File\RelativePathHelper;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Style\OutputStyle;
 
 class JUnitErrorFormatter implements ErrorFormatter
 {
@@ -17,7 +16,7 @@ class JUnitErrorFormatter implements ErrorFormatter
         $this->relativePathHelper = $relativePathHelper;
     }
 
-    public function formatErrors(AnalysisResult $analysisResult, OutputStyle $style): int
+    public function formatErrors(AnalysisResult $analysisResult, Output $output): int
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $testsuites = $dom->appendChild($dom->createElement('testsuites'));
@@ -84,7 +83,7 @@ class JUnitErrorFormatter implements ErrorFormatter
 
         $dom->formatOutput = true;
 
-        $style->write($style->isDecorated() ? OutputFormatter::escape($dom->saveXML()) : $dom->saveXML());
+        $output->writeRaw($dom->saveXML());
 
         return $returnCode;
     }
